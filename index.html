@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Iconfont 转 dart 类</title>
+  <style>
+    .input-block {
+      margin-top: 20px;
+    }
+    .file-input-btn {
+      line-height: 1.5;
+      position: relative;
+      display: inline-block;
+      font-weight: 400;
+      white-space: nowrap;
+      text-align: center;
+      background-image: none;
+      border: 1px solid transparent;
+      -webkit-box-shadow: 0 2px 0 rgba(0,0,0,0.015);
+      box-shadow: 0 2px 0 rgba(0,0,0,0.015);
+      cursor: pointer;
+      -webkit-transition: all .3s cubic-bezier(.645, .045, .355, 1);
+      transition: all .3s cubic-bezier(.645, .045, .355, 1);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -ms-touch-action: manipulation;
+      touch-action: manipulation;
+      padding: 10px 15px;
+      font-size: 14px;
+      border-radius: 4px;
+      color: rgba(0,0,0,0.65);
+      background-color: #fff;
+      border-color: #d9d9d9;
+    }
+    .file-input-btn:hover {
+      color: #40a9ff;
+      background-color: #fff;
+      border-color: #40a9ff;
+    }
+    .hide {
+      display: none;
+    }
+    .center {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="center">Iconfont 转 dart 类</h1>
+  <form id="the-form" onsubmit="return false;">
+    <div class="center input-block">
+      <label class="file-input-btn" for="json-file">
+        上传<strong>iconfont.json</strong>文件
+      </label>
+      <input class="hide" type="file" id="json-file" onchange="uploadChange(this)" accept=".json">
+    </div>
+    <div class="center input-block">
+      <textarea id="js-result" cols="100" rows="30"></textarea>
+    </div>
+  </form>
+  <script>
+    function uploadChange (e) {
+      const file = e.files[0]
+      const reader = new FileReader()
+      reader.readAsText(file)
+      reader.onload = e => {
+        const res = e.target.result
+        const json = JSON.parse(res)
+        const fontFamily = json.font_family
+        let fontCode = ''
+        json.glyphs.forEach(v => {
+        fontCode += `
+          static const IconData ${v.font_class} = const IconData(
+            0x${v.unicode},
+            fontFamily: '${fontFamily}',
+            matchTextDirection: true
+          );
+        `
+        })
+        const result = `
+          class MyIcons {
+            ${fontCode}
+          }
+        `
+        const resultTextarea = document.getElementById('js-result')
+        resultTextarea.value = result
+      }
+    }
+  </script>
+</body>
+</html>
